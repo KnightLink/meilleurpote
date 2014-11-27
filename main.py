@@ -1,3 +1,3 @@
 def testmdr():
-    print("loldd")
+    print("lolddd")
 testmdr()
