@@ -1,5 +1,5 @@
-import node.py
-import bus.py
+import node
+import bus
 
 class Edge: # Arete
     def __init__(self,id,node1,node2):

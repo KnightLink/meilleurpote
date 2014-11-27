@@ -1,4 +1,4 @@
-import edge.py
+import edge
 
 class Node: # Noeud
     def __init__(self,id,owner=0):
