@@ -1,3 +1,7 @@
+import node.py
+
 class Edge:
-    def __init__(self,node_linked):
-        self.node_linked=[]
+    def __init__(self,node1,node2):
+        self.node1=node1
+        self.node2=node2
+        
