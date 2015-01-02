@@ -1,5 +1,4 @@
-import edge
-import node
+import edge, node
 
 class Bus: # Vaisseau de transport d'unités
     def __init__(self,owner,direction,units,progress):
