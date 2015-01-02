@@ -1,2 +1,5 @@
 __pycache__/
 .c9/
+*.py[co]
+!poooc.pyc
+!poooserver.pyc
