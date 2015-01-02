@@ -1,8 +1,7 @@
 import re
-from board import Board 
+from board import *
 from AI import AI
-from node import Node
-from edge import Edge
+
 
 
 print("tapez 1 pour test le board, 2 pour test le regex")
