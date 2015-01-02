@@ -1,6 +1,7 @@
 import re
 from board import *
 from AI import AI
+import potocole
 
 
 
@@ -8,19 +9,19 @@ print("tapez 1 pour test le board, 2 pour test le regex")
 which = input() ;
 if (which == "1") :
     mainBoard=Board(3)
-    n1=Node(1,1)
-    n2=Node(2,1)
-    n3=Node(3,1)
+    n1=Node(1,0)
+    n2=Node(2,0)
+    n3=Node(3,0)
     
-    n4=Node(4,2,3)
-    n5=Node(5,2)
-    n6=Node(6,2)
+    n4=Node(4,1,3)
+    n5=Node(5,1)
+    n6=Node(6,1)
     
-    n7=Node(7,3)
-    n8=Node(8,3)
-    n9=Node(9,2)
+    n7=Node(7,2)
+    n8=Node(8,2)
+    n9=Node(9,1)
     
-    n10=Node(10,1)
+    n10=Node(10,0)
     
     n1.units=10
     n2.units=15
@@ -36,7 +37,7 @@ if (which == "1") :
     
     n10.units=5
     
-    mainBoard.nodes=(n1,n2,n3,n4,n5,n6,n7,n8,n9,n10)
+    mainBoard.nodes=[n1,n2,n3,n4,n5,n6,n7,n8,n9,n10]
     
     e1=Edge(1,n1,n2,2000)
     e2=Edge(2,n1,n3,2000)
@@ -58,11 +59,11 @@ if (which == "1") :
     
     ai=AI(mainBoard);
     
+    print(ai.evalBoard(0))
     print(ai.evalBoard(1))
     print(ai.evalBoard(2))
-    print(ai.evalBoard(3))
     
-    print(ai.evalBoardByNodeWeight(2))
+    print(ai.evalBoardByNodeWeight(1))
 elif (which == "2") :
     string = "INIT20ac18ab-6d18-450e-94af-bee53fdc8fcaTO6[2];1;3CELLS:1(23,9)'2'30'8'I,2(41,55)'1'30'8'II,3(23,103)'1'20'5'I;2LINES:1@3433OF2,1@6502OF3"
     matchObj = re.search(r'^INIT([0-9abcdef\-]*)TO(\d+)\[(\d+)];(\d);([^;]*);([^;]*)$',string)

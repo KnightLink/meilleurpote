@@ -15,9 +15,9 @@ class AI:
         
         playersValue = {} ;
         for i in range(self.board.nb_player):
-            playersValue[i+1] = [0,0,0] ; # playersValue[num] = (nbunit,nbnode)
+            playersValue[i] = [0,0,0] ; # playersValue[num] = (nbunit,nbnode)
         for n in self.board.nodes :
-            if n.owner != 0 :
+            if n.owner != -1 :
                 nbOwned = 0
                 for adjNode in n.getAdjoining():
                     if adjNode.owner == n.owner:

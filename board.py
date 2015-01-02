@@ -23,7 +23,7 @@ class Edge: # Arete
         self.length=length
 		
 class Node: # Noeud
-    def __init__(self,id,owner=0,production_speed=1):
+    def __init__(self,id,owner=-1,production_speed=1):
         self.id=id
         self.edges=[]
         self.owner=owner # -1 = neutre
