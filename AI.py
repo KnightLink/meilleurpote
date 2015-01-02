@@ -51,5 +51,40 @@ class AI:
     
     def evalBoardByNodeWeight(self,playerNb):
         for n in self.board.nodes:
-            print(str(n.id)+" : "+str(n.evalWeight(playerNb)))
+            print(str(n.id)+" : "+str(self.evalNodeWeight(n,playerNb)))
+
+    def evalNodeWeight(self,node,owner):
+        sum =0
+        
+        WEIGHT_SELF_ALLY=2; # superieur a WEIGHT SELF ENEMY: tendence à la defense, sinon YOLO
+        WEIGHT_SELF_ENEMY=6; # superieur a WEIGHT SELF ALLY : tendence à l'attaque
+        WEIGHT_ALLIES=-2;
+        WEIGHT_NEUTRAL=2;
+        WEIGHT_ENEMIES=4;
+        WEIGHT_RATIO_PRODUCTION=3;
+        WEIGHT_PER_UNIT = 0.2 ;
+        
+        if (owner == node.owner):
+            sum+=WEIGHT_SELF_ALLY ;
+        else :
+            sum+=WEIGHT_SELF_ENEMY*(1+WEIGHT_PER_UNIT*node.units) ;
+        
+        #TODO : 5 et 6 bugue pour joueur 3 !!!!!
+        adjoining = node.getAdjoining()
+        for obj in adjoining :
+            if obj.owner == owner :
+                if node.owner == owner or node.owner == -1 :
+                    sum += WEIGHT_ALLIES + WEIGHT_RATIO_PRODUCTION* (1-obj.productionSpeed) ;
+                else:
+                    sum -= WEIGHT_ALLIES *(1+WEIGHT_PER_UNIT*obj.units)
+            elif obj.owner == 0 :
+                sum += WEIGHT_NEUTRAL + WEIGHT_RATIO_PRODUCTION* (1-obj.productionSpeed)  ;
+            else :
+                if node.owner == owner or node.owner == -1 :
+                    sum += WEIGHT_ENEMIES *(1+WEIGHT_PER_UNIT*obj.units) + WEIGHT_RATIO_PRODUCTION* (1-obj.productionSpeed)  ;
+                else :
+                    sum -= WEIGHT_ENEMIES *(1+WEIGHT_PER_UNIT*obj.units) ;
+                    
+        return sum ;
+        
         
