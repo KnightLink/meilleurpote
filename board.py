@@ -8,9 +8,13 @@ class Board:
 			for dict in nodes :
 				i+=1 ;
 				if 'speed' in dict :
-					self.nodes.append(Node(i,dict['speed']))
+					self.nodes.append(Node(i,-1,dict['speed']))
 				else:
-					self.nodes.append(Node(i,1))
+					self.nodes.append(Node(i))
+				
+				if 'owner' in dict :
+					self.nodes[i-1].owner = dict['owner'] ;
+
 				if 'nbUnits' in dict :
 					self.nodes[i-1].units = dict['nbUnits'] ;
 
@@ -18,11 +22,18 @@ class Board:
 		self.speed = 1 ;
 		self.time = 0 ; #millisecondes
 		
-	def addEdges(self,edges):
+	def addEdges(self,edges): #list of tuples (node_id1,node_id2,dist)
 		i=0 ;
 		for tuple in edges :
 			i+=1;
-				
+			Edge(i,self.nodes[tuple[0]-1],self.nodes[tuple[1]-1],tuple[2])
+			
+	def __str__(self):
+		string = "" ;
+		for node in self.nodes :
+			string += "NODE"+str(node.id)+" "+str(node.units)+" UNITS WITH "+str(node.productionSpeed)+" SPEED AND OWNER "+str(node.owner)+"\n";
+		return string ;
+			
 			
 		
 		
