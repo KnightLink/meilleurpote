@@ -63,7 +63,28 @@ def stateToTupleLists(state_string): #board est envoye par reference
 		
 		list_cells.append((id,owner,offsize,defsize));
 
-	liste_line = re.findall("(\d+\[-?\d+\]\d+\'\d+)",string_cells);
+	liste_line = re.findall("(?:,|^)([^,]+)",string_moves);
+
+	for i in range (len(liste_line)):
+		
+		information = re.search("(\d+)((?:<|>)[^,]*)(\d+)(?:,|$)",liste_line[i]);
+		node1 = int(information.group(1)) ;
+		bus = information.group(2) ;
+		node2 = int(information.group(3))
+		all_bus = re.findall("([^']*)'",bus)
+		
+		for j in range(len(all_bus)):
+			bus_data = re.search("(>|<)(\d+)\[(\d+)\]@(\d+)",all_bus[j]);
+			bus_direction = bus_data.group(1);
+			bus_units = int(bus_data.group(2));
+			bus_owner = int(bus_data.group(3));
+			bus_timestamp = int(bus_data.group(4));
+			if ( bus_direction == ">" ):
+				list_moves.append((node1,node2,bus_units,bus_owner,bus_timestamp));
+			else :
+				list_moves.append((node2,node1,bus_units,bus_owner,bus_timestamp));
+		
+		
 	#print("LISTCELLSMOVES : ",list_cells,list_moves);
 	return (list_cells,list_moves);
 	#print("Cells  :",string_cells);

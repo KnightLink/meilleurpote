@@ -22,16 +22,40 @@ class Board:
 		self.speed = 1 ;
 		self.time = 0 ; #millisecondes
 		
+	def getEdge(self,node1,node2):
+		#PRINT FOR DEBUG PURPOSES
+		#print("GET_EDGE : ",node1.id, " + ", node2.id);
+		for e in node1.edges :
+			#print(e.node1.id,"  ",e.node2.id,"  ",node2.id);
+			if (e.node1 == node2 or e.node2 == node2) :
+				#print("RESULT : OK");
+				return e ;
+		#print("RESULT : SRYNO");
+		return None ;
+		
 	def addEdges(self,edges): #list of tuples (node_id1,node_id2,dist)
 		i=0 ;
 		for tuple in edges :
 			i+=1;
-			Edge(i,self.nodes[tuple[0]-1],self.nodes[tuple[1]-1],tuple[2])
+			Edge(i,self.nodes[tuple[0]],self.nodes[tuple[1]],tuple[2])
 			
 	def __str__(self):
 		string = "" ;
 		for node in self.nodes :
-			string += "NODE"+str(node.id)+" "+str(node.units)+" UNITS WITH "+str(node.productionSpeed)+" SPEED AND OWNER "+str(node.owner)+"\n";
+			string += "NODE"+str(node.id)+" "+str(node.units)+" UNITS ("+str(node.defunits)+" DEF) WITH "+str(node.productionSpeed)+" SPEED AND OWNER "+str(node.owner)+"\n";
+		string += "CONNECTIONS :\n";
+		edges = [] 
+		for node in self.nodes :
+			for e in node.edges :
+				if e.id in edges :
+					pass
+				else :
+					for bus in e.bus :
+						if bus.destination == e.node1.id :
+							string+= str(e.node2.id) + " GOING TO " + str(e.node1.id) + " WITH "+str(bus.units) +" UNITS (OWNER : "+ str(bus.owner) +") \n" ;
+						else :
+							string+= str(e.node2.id) + " GOING TO " + str(e.node1.id) + " WITH "+str(bus.units) +" UNITS (OWNER : "+ str(bus.owner) +") \n" ;
+					edges.append(e.id);
 		return string ;
 		
 	def updateCells(self,cells): #cells : list of tuples
@@ -41,21 +65,26 @@ class Board:
 			self.nodes[id].units = c[2] ;
 			self.nodes[id].defunits = c[3] ;
 	
-	def updateMoves(self,moves): #moves : liste de (src,dest,amount,timestamp)
+	def updateMoves(self,moves): #moves : liste de (src,dest,amount,owner,timestamp)
 		for n in self.nodes :
 			for e in n.edges :
 				del e.bus[:]
+				
+		for move in moves :
+			(source,dest,amount,owner,timestamp) = move
+			self.getEdge(self.nodes[source],self.nodes[dest]).bus.append(Bus(owner,dest,amount,timestamp)) ;
+
+		#print("EXISTING BUS : ",moves);
 		
 		
 class Bus: # Vaisseau de transport d'unités
-	def __init__(self,owner,direction,units,progress):
+	def __init__(self,owner,destination,units,time_start):
 		self.owner=owner
-		self.direction=direction 
-		# direction = 1 : vers node1
-		# direction = 2 : vers node2
+		self.destination=destination
+		# destination === cell_id 
 		
 		self.units=units
-		self.progress=progress
+		self.time_start=time_start
 		
 class Edge: # Arete
 	def __init__(self,id,node1,node2,length):

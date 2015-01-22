@@ -70,6 +70,7 @@ def init_pooo(init_string):
 	(nbPlayers,playerId,l_n,l_e) = potocole.initStringToAI(init_string);
 	print("NUMERO DU JOUEUR :",playerId);
 	board = Board(nbPlayers,l_n);
+	print("EDGES :" ,l_e);
 	board.addEdges(l_e);
 	MATCH_AI = AI(board,playerId) ;
 	
@@ -113,9 +114,9 @@ def play_pooo():
 			
 			list_cells = cells_moves[0] ;
 			list_moves = cells_moves[1] ;
+			MATCH_AI.board.time = etime() ;
 			MATCH_AI.board.updateCells(list_cells);
 			MATCH_AI.board.updateMoves(list_moves);
-			MATCH_AI.board.time = etime() ;
 			print("CURRENT_BOARD AT TIME "+str(MATCH_AI.board.time)+" :");
 			print(MATCH_AI.board);
 			print("_______________");
