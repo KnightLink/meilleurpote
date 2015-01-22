@@ -33,18 +33,41 @@ def initStringToAI(string):
 			vitesse=3
 		
 		l_n[i]['speed'] = vitesse ;
-	print(l_n);
+	#print(l_n);
 	liste_edge = re.findall("([0-9]+@[0-9]+OF[0-9]+)",lines_string);
 	l_e =[]; # liste des Edges
 	for i in range (len(liste_edge)):
 		information=re.search("([0-9]+)@([0-9]+)OF([0-9]+)",liste_edge[i])
 		l_e.append((int(information.group(1)),int(information.group(3)),int(information.group(2))));
 	
-	print(l_e);
+	#print(l_e);
+	return (nbPlayers,playerId,l_n,l_e) ;
+
+
+def stateToTupleLists(state_string): #board est envoye par reference
+	matchObj = re.search(r'^STATE[\w-]+;\d+CELLS:([^;]*);\d+MOVES:?([^:]*)$',state_string)
+	string_cells = matchObj.group(1);
+	string_moves = matchObj.group(2);
 	
-	board = Board(nbPlayers,l_n);
+	list_cells= [];
+	list_moves= [];
 	
-	board.addEdges(l_e);
+	liste_node = re.findall("(\d+\[-?\d+\]\d+\'\d+)",string_cells);
+	for i in range (len(liste_node)):
+		
+		information = re.search("(\d+)\[(-?\d+)\](\d+)\'(\d+)",liste_node[i]);
+		id = int(information.group(1)) ;
+		owner = int(information.group(2))
+		offsize = int(information.group(3))
+		defsize = int(information.group(4))
+		
+		list_cells.append((id,owner,offsize,defsize));
+
+	liste_line = re.findall("(\d+\[-?\d+\]\d+\'\d+)",string_cells);
+	#print("LISTCELLSMOVES : ",list_cells,list_moves);
+	return (list_cells,list_moves);
+	#print("Cells  :",string_cells);
+	#print("Moves  :",string_moves);
 	
-	
-	return AI(board,playerId) ;
+def encodeOrder(src_cell,dest_cell,amount=100): #amount en %
+	return "MOV"+str(amount)+"FROM"+str(src_cell)+"TO"+str(dest_cell) ;

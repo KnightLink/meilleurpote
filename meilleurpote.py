@@ -16,6 +16,8 @@ __version__='0.1'
 ## chargement de l'interface de communication avec le serveur
 from poooc import order, state, state_on_update, etime
 import potocole
+from board import Board
+from AI import AI
 # mieux que des print partout
 import logging
 # pour faire de l'introspection
@@ -33,6 +35,7 @@ def register_pooo(uid):
 		"0947e717-02a1-4d83-9470-a941b6e8ed07"
 		
 	"""
+	print(uid);
 	global GLOBAL_UID 
 	GLOBAL_UID = uid ;
 
@@ -62,8 +65,14 @@ def init_pooo(init_string):
 		"INIT20ac18ab-6d18-450e-94af-bee53fdc8fcaTO6[2];1;3CELLS:1(23,9)'2'30'8'I,2(41,55)'1'30'8'II,3(23,103)'1'20'5'I;2LINES:1@3433OF2,1@6502OF3"
 		
 	"""
-	global MATCH_AI 
-	MATCH_AI = potocole.initStringToAI(init_string);
+	print("INIT DU MATCH");
+	global MATCH_AI ;
+	(nbPlayers,playerId,l_n,l_e) = potocole.initStringToAI(init_string);
+	print("NUMERO DU JOUEUR :",playerId);
+	board = Board(nbPlayers,l_n);
+	board.addEdges(l_e);
+	MATCH_AI = AI(board,playerId) ;
+	
 	
 	
 	
@@ -72,7 +81,54 @@ def play_pooo():
 	
 	"""
 	logging.info('Entering play_pooo fonction from {} module...'.format(inspect.currentframe().f_back.f_code.co_filename))
-	### Début stratégie joueur ### 
+	
+	
+	global MATCH_AI
+	global GLOBAL_UID
+	print("===========DEBUT DU MATCH");
+	
+	#ON RECUPERE l'ETAT INITIAL ET ON UPDATE BOARD
+	
+	initial_state = state() ;
+	print("===STATE====",initial_state)
+	#(list_cells,list_moves) = 
+	cells_moves = potocole.stateToTupleLists(initial_state);
+	list_cells = cells_moves[0] ;
+	list_moves = cells_moves[1] ;
+	MATCH_AI.board.updateCells(list_cells);
+	MATCH_AI.board.updateMoves(list_moves);
+	a= True ;
+	
+	#print optionnel, pour debug
+	print(MATCH_AI.board);
+	
+	while True:
+		current_state = state_on_update();
+		if current_state[0] == "E" : # END OF GAME
+			break;
+		elif current_state[0] == "G" : # GAME_OVER 
+			break;
+		else: #STATE
+			cells_moves = potocole.stateToTupleLists(current_state);
+			
+			list_cells = cells_moves[0] ;
+			list_moves = cells_moves[1] ;
+			MATCH_AI.board.updateCells(list_cells);
+			MATCH_AI.board.updateMoves(list_moves);
+			MATCH_AI.board.time = etime() ;
+			print("CURRENT_BOARD AT TIME "+str(MATCH_AI.board.time)+" :");
+			print(MATCH_AI.board);
+			print("_______________");
+			if a :
+				MATCH_AI.createOrders();
+			a = False if a else True ;
+			
+			while (len(MATCH_AI.orders)>0): #enleve les 1ers de la liste et les mets en ORDER
+				order("["+GLOBAL_UID+"]"+MATCH_AI.orders.pop(0));
+			
+	print("===========FINDUS MATCH");
+	
+
 	# séquence type :
 	# (1) récupère l'état initial 
 	# init_state = state()

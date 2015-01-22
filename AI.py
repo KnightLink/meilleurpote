@@ -1,9 +1,10 @@
 from board import Board
-
+import potocole
 class AI:
 	def __init__(self,board,playerId = 0):
 		self.board = board ;
 		self.playerId = playerId ;
+		self.orders = [] ; # liste de STRING
 		
 	def evalBoard(self,playerNb):
 		#GLOBALS
@@ -47,8 +48,12 @@ class AI:
 		total_player_value = playersValue[playerNb][0]+playersValue[playerNb][1] ; 
 		return total_player_value / sum_value ;
 		
-	def getBestOrder(self,playerNb):
-		pass
+	def createOrders(self):
+		# CREER LA STRAT ICI !!
+		if self.playerId == 0 :
+			self.orders.append(potocole.encodeOrder(0,1,90));
+		elif self.playerId == 1 :
+			self.orders.append(potocole.encodeOrder(6,5,90));
 	
 	def evalBoardByNodeWeight(self,playerNb):
 		for n in self.board.nodes:

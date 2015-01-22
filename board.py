@@ -8,9 +8,9 @@ class Board:
 			for dict in nodes :
 				i+=1 ;
 				if 'speed' in dict :
-					self.nodes.append(Node(i,-1,dict['speed']))
+					self.nodes.append(Node(i-1,-1,dict['speed']))
 				else:
-					self.nodes.append(Node(i))
+					self.nodes.append(Node(i-1))
 				
 				if 'owner' in dict :
 					self.nodes[i-1].owner = dict['owner'] ;
@@ -33,14 +33,27 @@ class Board:
 		for node in self.nodes :
 			string += "NODE"+str(node.id)+" "+str(node.units)+" UNITS WITH "+str(node.productionSpeed)+" SPEED AND OWNER "+str(node.owner)+"\n";
 		return string ;
-			
-			
+		
+	def updateCells(self,cells): #cells : list of tuples
+		for c in cells :
+			id = c[0]
+			self.nodes[id].owner = c[1] ;
+			self.nodes[id].units = c[2] ;
+			self.nodes[id].defunits = c[3] ;
+	
+	def updateMoves(self,moves): #moves : liste de (src,dest,amount,timestamp)
+		for n in self.nodes :
+			for e in n.edges :
+				del e.bus[:]
 		
 		
 class Bus: # Vaisseau de transport d'unités
 	def __init__(self,owner,direction,units,progress):
 		self.owner=owner
-		self.direction=direction
+		self.direction=direction 
+		# direction = 1 : vers node1
+		# direction = 2 : vers node2
+		
 		self.units=units
 		self.progress=progress
 		
@@ -59,7 +72,8 @@ class Node: # Noeud
 		self.id=id
 		self.edges=[]
 		self.owner=owner # -1 = neutre
-		self.units=0
+		self.units=0 ;
+		self.defunits = 0 ;
 		self.productionSpeed=production_speed
 		
 	def getAdjoining(self):
