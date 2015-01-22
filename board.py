@@ -52,9 +52,9 @@ class Board:
 				else :
 					for bus in e.bus :
 						if bus.destination == e.node1.id :
-							string+= str(e.node2.id) + " GOING TO " + str(e.node1.id) + " WITH "+str(bus.units) +" UNITS (OWNER : "+ str(bus.owner) +") \n" ;
+							string+= str(e.node2.id) + " GOING TO " + str(e.node1.id) + " WITH "+str(bus.units) +" UNITS (OWNER : "+ str(bus.owner) +", TIMESTAMP :"+ str(bus.time_start) +") \n" ;
 						else :
-							string+= str(e.node2.id) + " GOING TO " + str(e.node1.id) + " WITH "+str(bus.units) +" UNITS (OWNER : "+ str(bus.owner) +") \n" ;
+							string+= str(e.node1.id) + " GOING TO " + str(e.node2.id) + " WITH "+str(bus.units) +" UNITS (OWNER : "+ str(bus.owner) +", TIMESTAMP :"+ str(bus.time_start) +") \n" ;
 					edges.append(e.id);
 		return string ;
 		
