@@ -2,7 +2,7 @@ import re
 from board import *
 from AI import AI
 import potocole
-import display
+from display import *
 from tkinter import *
 from tkinter import ttk
 
@@ -40,3 +40,9 @@ print(ai.evalBoard(1))
 print(ai.evalBoard(2))
 
 print(ai.evalBoardByNodeWeight(1,True))
+
+root=Tk()
+root.title="Test"
+app=Display(mainBoard,master=root)
+app.mainloop()
+root.destroy()

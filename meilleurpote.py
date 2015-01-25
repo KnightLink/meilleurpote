@@ -22,6 +22,9 @@ from AI import AI
 import logging
 # pour faire de l'introspection
 import inspect
+from tkinter import *
+from tkinter import ttk
+from display import *
 
 GLOBAL_UID = ""
 def register_pooo(uid):
@@ -74,6 +77,7 @@ def init_pooo(init_string):
 	board.addEdges(l_e);
 	MATCH_AI = AI(board,playerId) ;
 	
+		
 	
 	
 	
@@ -92,13 +96,18 @@ def play_pooo():
 	
 	initial_state = state() ;
 	print("===STATE====",initial_state)
-	#(list_cells,list_moves) = 
+	#(list_cells,list_moves) =
 	cells_moves = potocole.stateToTupleLists(initial_state);
 	list_cells = cells_moves[0] ;
 	list_moves = cells_moves[1] ;
 	MATCH_AI.board.updateCells(list_cells);
 	MATCH_AI.board.updateMoves(list_moves);
 	a= True ;
+	root=Tk()
+	root.title="Test"
+	can=Canvas(master=root, width=500, height=500)
+	can.pack()
+	app=Display(MATCH_AI.board,master=root,canvas=can)
 	
 	#print optionnel, pour debug
 	print(MATCH_AI.board);
@@ -120,6 +129,10 @@ def play_pooo():
 			print("CURRENT_BOARD AT TIME "+str(MATCH_AI.board.time)+" :");
 			print(MATCH_AI.board);
 			print("_______________");
+			app.canvas.delete("all")
+			app.full_display() #actualisation interface
+			app.canvas.update()
+			#app.mainloop()
 			if a :
 				MATCH_AI.createOrders();
 			a = False if a else True ;

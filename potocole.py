@@ -9,7 +9,7 @@ from AI import *
 from board import * 
 
 def initStringToAI(string):
-	
+	print(string)
 	matchObj = re.search(r'^INIT([0-9abcdef\-]*)TO(\d+)\[(\d+)];(\d);([^;]*);([^;]*)$',string)
 	nbPlayers = int(matchObj.group(2));
 	playerId = int(matchObj.group(3));
@@ -18,12 +18,12 @@ def initStringToAI(string):
 	lines_string = matchObj.group(6);
 	liste_node = re.findall("(\d+\(\d+\,\d+\)\'\d+\'\d+\'\d+\'I+)",cells_string);
 	l_n=[] #liste des Nodes
+	
 	for i in range (len(liste_node)):
 		l_n.append({})
 		information=re.search("(\d)(\(\d+,\d+\))\'(\d+)\'(\d+)\'(\d+)\'([I]+)",liste_node[i])
 		
-
-
+                
 		vitesse = 1;
 		if "I" == information.group(6) :
 			vitesse=1
@@ -31,9 +31,19 @@ def initStringToAI(string):
 			vitesse=2
 		if "III" == information.group(6):
 			vitesse=3
-		
+			
 		l_n[i]['speed'] = vitesse ;
-	#print(l_n);
+		coords=information.group(2)
+		print("CEDCIIEZFGZEIF"+coords)
+		coords=coords.replace("(","")
+		coords=coords.replace(")","")
+		xy=coords.split(",")
+		print(xy)
+		l_n[i]['x']=int(xy[0])
+		l_n[i]['y']=int(xy[1])
+		l_n[i]['r']=int(information.group(3))
+
+        #print(l_n);
 	liste_edge = re.findall("([0-9]+@[0-9]+OF[0-9]+)",lines_string);
 	l_e =[]; # liste des Edges
 	for i in range (len(liste_edge)):

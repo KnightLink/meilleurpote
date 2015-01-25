@@ -18,6 +18,13 @@ class Board:
 				if 'nbUnits' in dict :
 					self.nodes[i-1].units = dict['nbUnits'] ;
 
+				if 'x' in dict :
+					self.nodes[i-1].x = dict['x']
+					self.nodes[i-1].y = dict['y']
+
+				if 'r' in dict : 
+					self.nodes[i-1].r = dict['r']
+		
 		self.nb_player = nb_player ;
 		self.speed = 1 ;
 		self.time = 0 ; #millisecondes
@@ -42,7 +49,7 @@ class Board:
 	def __str__(self):
 		string = "" ;
 		for node in self.nodes :
-			string += "NODE"+str(node.id)+" "+str(node.units)+" UNITS ("+str(node.defunits)+" DEF) WITH "+str(node.productionSpeed)+" SPEED AND OWNER "+str(node.owner)+"\n";
+			string += "NODE"+str(node.id)+" "+str(node.units)+" UNITS ("+str(node.defunits)+" DEF) WITH "+str(node.productionSpeed)+" SPEED AND OWNER "+str(node.owner)+" X"+str(node.x)+"Y"+str(node.y)+"\n";
 		string += "CONNECTIONS :\n";
 		edges = [] 
 		for node in self.nodes :
@@ -104,6 +111,9 @@ class Node: # Noeud
 		self.units=0 ;
 		self.defunits = 0 ;
 		self.productionSpeed=production_speed
+		self.x=0
+		self.y=0
+		self.r=0
 		
 	def getAdjoining(self):
 		adj=[]
