@@ -2,6 +2,9 @@ import re
 from board import *
 from AI import AI
 import potocole
+import display
+from tkinter import *
+from tkinter import ttk
 
 mainBoard=Board(3,[
 {'nbUnits':10,'owner':0},
@@ -16,18 +19,18 @@ mainBoard=Board(3,[
 {'nbUnits':5,'owner':0}
 ])
 mainBoard.addEdges([
-(1,2,2000),
-(1,3,2000),
-(4,5,2000),
-(4,6,2000),
-(7,8,2000),
-(7,9,2000),
-(2,10,3000),
-(3,10,3000),
-(5,10,3000),
-(6,10,3000),
-(8,10,3000),
-(9,10,3000)]);
+(0,1,2000),
+(0,2,2000),
+(3,4,2000),
+(3,5,2000),
+(6,7,2000),
+(6,8,2000),
+(1,9,3000),
+(3,9,3000),
+(4,9,3000),
+(5,9,3000),
+(7,9,3000),
+(8,9,3000)]);
 
 ai=AI(mainBoard);
 print(mainBoard);
@@ -36,4 +39,4 @@ print(ai.evalBoard(0))
 print(ai.evalBoard(1))
 print(ai.evalBoard(2))
 
-print(ai.evalBoardByNodeWeight(1))
+print(ai.evalBoardByNodeWeight(1,True))

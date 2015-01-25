@@ -4,7 +4,7 @@
 
 
 import re
-from AI import AI
+from AI import *
 
 from board import * 
 

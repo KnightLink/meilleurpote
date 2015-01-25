@@ -49,15 +49,22 @@ class AI:
 		return total_player_value / sum_value ;
 		
 	def createOrders(self):
-		# CREER LA STRAT ICI !!
+		# Strategie
+		board_weight=self.evalBoardByNodeWeight(self.board.playerNb)
+		
 		if self.playerId == 0 :
 			self.orders.append(potocole.encodeOrder(0,1,90));
 		elif self.playerId == 1 :
 			self.orders.append(potocole.encodeOrder(6,5,90));
 	
-	def evalBoardByNodeWeight(self,playerNb):
+	def evalBoardByNodeWeight(self,playerNb,printing=False):
+		board_weight=dict()
 		for n in self.board.nodes:
-			print(str(n.id)+" : "+str(self.evalNodeWeight(n,playerNb)))
+			if printing==True:
+				board_weight[n.id]=self.evalNodeWeight(n,playerNb)
+			else:
+				print(str(n.id)+" : "+str(self.evalNodeWeight(n,playerNb)))
+		return board_weight
 
 	def evalNodeWeight(self,node,owner):
 		sum =0
