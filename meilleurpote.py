@@ -134,7 +134,7 @@ def play_pooo():
 			app.canvas.update()
 			#app.mainloop()
 			if a :
-				MATCH_AI.createOrders();
+				MATCH_AI.createOrders(2);
 			a = False if a else True ;
 			
 			while (len(MATCH_AI.orders)>0): #enleve les 1ers de la liste et les mets en ORDER

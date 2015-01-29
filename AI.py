@@ -49,8 +49,211 @@ class AI:
 		total_player_value = playersValue[playerNb][0]+playersValue[playerNb][1] ; 
 		return total_player_value / sum_value ;
 		
-	def createOrders(self):
-		# STRATEGIE
+	def createOrders(self,idstrat=1):
+		if idstrat==1:
+			self.strat_relevance()
+		if idstrat==2:
+			self.strat_direction()
+			
+	def strat_direction(self):
+		# STRATEGIE DIRECTIONS (couplage ordres directs + poids)
+		# Paramètres
+		CEILING_TO_EMPTY=0.8 # ça * maxunits = palier pour lequel noeud considéré à vider
+		DISPATCH_ORDER=["conquer","protect","provide","attack"] # ordre de traitement (NE PAS INCLURE OSEF OU EMPTY)
+		AMOUNT_PROTECT=80
+		AMOUNT_PROVIDE=50
+		AMOUNT_ATTACK=90
+		AMOUNT_CONQUER=80
+		# Table des poids
+		board_weight=self.evalBoardByNodeWeight(self.playerId)
+		# Initialisation dictionnaire des ordres
+		board_orders=dict()
+		board_rappel=dict()
+		for n in self.board.nodes:
+			board_orders[n.id]="osef"
+			board_rappel[n.id]=n
+		# Répartition des points
+		for n in self.board.nodes:
+			adj=n.getAdjoining()
+			nbenemyadj=0
+			nbpoteadj=0
+			# Points alliés
+			if n.owner==self.playerId:
+				for a in adj:
+					if a.owner != self.playerId and a.owner!=-1:
+						nbenemyadj+=1
+						print("NODE"+str(n.id)+" nbenemy+1 grace a NODE"+str(a.id))
+					if a.owner == self.playerId:
+						nbpoteadj+=1
+				if nbenemyadj<=1:
+					if nbenemyadj==1 or nbenemyadj<=math.floor(nbpoteadj/2+0.51):
+						board_orders[n.id]="provide"
+					if n.units>=(n.productionSpeed*10+10)*CEILING_TO_EMPTY or nbenemyadj==0:
+						board_orders[n.id]="empty"
+				if len(adj)>=3 and nbenemyadj==(len(adj)-1):
+					board_orders[n.id]="protect"
+					
+			# Points ennemis
+			if n.owner!=self.playerId and n.owner!=-1:
+				for a in adj:
+					if a.owner == self.playerId:
+						nbenemyadj+=1 # nbenemy, mais on parle du joueur qu'on controle
+						print("NODE"+str(n.id)+" nbenemy+1 grace a NODE"+str(a.id))
+				if nbenemyadj>=1:
+					board_orders[n.id]="attack"
+					
+			# Points neutres
+			if n.owner==-1:
+				nbotheradj=0
+				for a in adj:
+					if a.owner == self.playerId:
+						nbenemyadj+=1 # nbenemy, mais on parle du joueur qu'on controle
+						print("NODE"+str(n.id)+" nbenemy+1 grace a NODE"+str(a.id))
+					if a.owner != self.playerId and a.owner != -1:
+						nbotheradj+=1 # autres joueurs
+						print("NODE"+str(n.id)+" nbother+1 grace a NODE"+str(a.id))
+				if nbenemyadj==len(adj) or nbenemyadj>nbotheradj:
+					board_orders[n.id]="conquer"
+					
+		
+		# Verif
+		print(board_orders)
+		# DISPATCH
+		for order in DISPATCH_ORDER:
+			# Creation de la liste d'attente et la liste des noeuds "empty"
+			queue=[]
+			empty=[]
+			osef_ally=[]
+			provide=[]
+			for ids in board_orders.keys():
+				if board_orders[ids]==order:
+					queue.append(ids)
+				if board_orders[ids]=="empty":
+					empty.append(ids)
+				if board_orders[ids]=="osef" and board_rappel[ids].owner==self.playerId:
+					osef_ally.append(ids)
+				if board_orders[ids]=="provide":
+					provide.append(ids)
+			# Exploration
+			for nid_empty in empty:
+				node=board_rappel[nid_empty]
+				adj=node.getAdjoining()
+				if len(adj)==1:
+					self.orders.append(potocole.encodeOrder(nid_empty,adj[0].id,100))
+				
+			for nid in queue: # nid = n ID
+				node=board_rappel[nid]
+				adj=node.getAdjoining()
+				queue_empty=[]
+				queue_osef=[]
+				queue_provide=[]
+				for a in adj:
+					if a.id in empty:
+						queue_empty.append(a.id)
+					if a.id in osef_ally:
+						queue_osef.append(a.id)
+					if a.id in provide:
+						queue_provide.append(a.id)
+						
+				if order=="protect":
+					if len(queue_empty)==1:
+						self.orders.append(potocole.encodeOrder(queue_empty[0],nid,AMOUNT_PROTECT))
+					elif len(queue_empty)>1:
+						best=[queue_empty[0],board_weight[queue_empty[0]]]
+						for q in queue_empty:
+							if board_weight[q]>best[1]:
+								best=[q,board_weight[q]]
+						self.orders.append(potocole.encodeOrder(best[0],nid,AMOUNT_PROTECT))
+					elif len(queue_provide)>=1:
+						if len(queue_provide)==1:
+							self.orders.append(potocole.encodeOrder(queue_provide[0],nid,AMOUNT_PROTECT))
+						else:
+							best=[queue_provide[0],board_weight[queue_provide[0]]]
+							for q in queue_provide:
+								if board_weight[q]>best[1]:
+									best=[q,board_weight[q]]
+							self.orders.append(potocole.encodeOrder(best[0],nid,AMOUNT_PROTECT))
+					elif len(queue_osef)>=1:
+						if len(queue_osef)==1:
+							self.orders.append(potocole.encodeOrder(queue_osef[0],nid,AMOUNT_PROTECT))
+						else:
+							best=[queue_osef[0],board_weight[queue_osef[0]]]
+							for q in queue_osef:
+								if board_weight[q]>best[1]:
+									best=[q,board_weight[q]]
+							self.orders.append(potocole.encodeOrder(best[0],nid,AMOUNT_PROTECT))
+
+				if order=="conquer":
+					if len(queue_empty)>=1:
+						if len(queue_empty)==1:
+							self.orders.append(potocole.encodeOrder(queue_empty[0],nid,AMOUNT_CONQUER))
+						else:
+							best=[queue_empty[0],board_weight[queue_empty[0]]]
+							for q in queue_empty:
+								if board_weight[q]>best[1]:
+									best=[q,board_weight[q]]
+							self.orders.append(potocole.encodeOrder(best[0],nid,AMOUNT_CONQUER))
+					elif len(queue_provide)>=1:
+						if len(queue_provide)==1:
+							self.orders.append(potocole.encodeOrder(queue_provide[0],nid,AMOUNT_CONQUER))
+						else:
+							best=[queue_provide[0],board_weight[queue_provide[0]]]
+							for q in queue_provide:
+								if board_weight[q]>best[1]:
+									best=[q,board_weight[q]]
+							self.orders.append(potocole.encodeOrder(best[0],nid,AMOUNT_CONQUER))
+					elif len(queue_osef)>=1:
+						if len(queue_osef)==1:
+							self.orders.append(potocole.encodeOrder(queue_osef[0],nid,AMOUNT_CONQUER))
+						else:
+							best=[queue_osef[0],board_weight[queue_osef[0]]]
+							for q in queue_osef:
+								if board_weight[q]>best[1]:
+									best=[q,board_weight[q]]
+							self.orders.append(potocole.encodeOrder(best[0],nid,AMOUNT_CONQUER))
+				
+				if order=="attack":
+					if len(queue_empty)>=1:
+						if len(queue_empty)==1:
+							self.orders.append(potocole.encodeOrder(queue_empty[0],nid,AMOUNT_ATTACK))
+						else:
+							best=[queue_empty[0],board_weight[queue_empty[0]]]
+							for q in queue_empty:
+								if board_weight[q]>best[1]:
+									best=[q,board_weight[q]]
+							self.orders.append(potocole.encodeOrder(best[0],nid,AMOUNT_ATTACK))
+					elif len(queue_provide)>=1:
+						if len(queue_provide)==1:
+							self.orders.append(potocole.encodeOrder(queue_provide[0],nid,AMOUNT_ATTACK))
+						else:
+							best=[queue_provide[0],board_weight[queue_provide[0]]]
+							for q in queue_provide:
+								if board_weight[q]>best[1]:
+									best=[q,board_weight[q]]
+							self.orders.append(potocole.encodeOrder(best[0],nid,AMOUNT_ATTACK))
+							
+				if order=="provide":
+					if len(queue_empty)>=1:
+						if len(queue_empty)==1:
+							self.orders.append(potocole.encodeOrder(queue_empty[0],nid,AMOUNT_PROVIDE))
+						else:
+							best=[queue_empty[0],board_weight[queue_empty[0]]]
+							for q in queue_empty:
+								if board_weight[q]>best[1]:
+									best=[q,board_weight[q]]
+							self.orders.append(potocole.encodeOrder(best[0],nid,AMOUNT_PROVIDE))	
+					elif len(queue_osef)>=1:
+						if len(queue_osef)==1:
+							self.orders.append(potocole.encodeOrder(queue_osef[0],nid,AMOUNT_PROVIDE))
+						else:
+							best=[queue_osef[0],board_weight[queue_osef[0]]]
+							for q in queue_osef:
+								if board_weight[q]>best[1]:
+									best=[q,board_weight[q]]
+							self.orders.append(potocole.encodeOrder(best[0],nid,AMOUNT_PROVIDE))
+							
+	def strat_relevance(self):
+		# STRATEGIE RELEVANCE (seulement les poids)
 		# Ecart max = Poids le plus grand - Poids le plus faible
 		# Relevance = (Poids du noeud - Poids le plus faible) / Ecart max
 		# Paramètres

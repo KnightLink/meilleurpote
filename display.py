@@ -9,10 +9,9 @@ class Display(Frame):
         self.canvas=canvas
 
     def full_display(self,mult_padding=0.025,add_padding=30,mult_size=0.2):
-        
-        self.nodes_display(mult_padding,add_padding,mult_size)
         self.edges_display(mult_padding,add_padding,mult_size)
         self.moves_display(mult_padding,add_padding,mult_size)
+        self.nodes_display(mult_padding,add_padding,mult_size)
 
     def moves_display(self,mult_padding,add_padding,mult_size):
         for n in self.board.nodes :
@@ -58,8 +57,9 @@ class Display(Frame):
             if node.owner==3:
                 cfill="yellow"
             self.canvas.create_oval(node.x*mult_padding+add_padding,node.y*mult_padding+add_padding,node.x*mult_padding+node.r*mult_size+add_padding,node.y*mult_padding+node.r*mult_size+add_padding,fill=cfill)
-            self.canvas.create_text(node.x*mult_padding+add_padding,node.y*mult_padding+add_padding-10,text=node.units,fill="black")
-
+            self.canvas.create_text(node.x*mult_padding+add_padding+10,node.y*mult_padding+add_padding-10,text=str(node.units)+" | "+str(node.defunits),fill="black")
+            self.canvas.create_text(node.x*mult_padding+add_padding+node.r*mult_size/2,node.y*mult_padding+add_padding+node.r*mult_size/2,text=node.id,fill="black")
+			
     def edges_display(self,mult_padding,add_padding,mult_size):
         for n in self.board.nodes :
             for edge in n.edges :
