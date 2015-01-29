@@ -138,7 +138,9 @@ def play_pooo():
 			a = False if a else True ;
 			
 			while (len(MATCH_AI.orders)>0): #enleve les 1ers de la liste et les mets en ORDER
-				order("["+GLOBAL_UID+"]"+MATCH_AI.orders.pop(0));
+				temp_order = MATCH_AI.orders.pop(0) ;
+				#print("ORDER :"+temp_order);
+				order("["+GLOBAL_UID+"]"+temp_order);
 			
 	print("===========FINDUS MATCH");
 	

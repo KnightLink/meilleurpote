@@ -10,7 +10,7 @@ from board import *
 
 def initStringToAI(string):
 	print(string)
-	matchObj = re.search(r'^INIT([0-9abcdef\-]*)TO(\d+)\[(\d+)];(\d);([^;]*);([^;]*)$',string)
+	matchObj = re.search(r'^INIT([0-9abcdef\-]*)TO(\d+)\[(\d+)];(\d+);([^;]*);([^;]*)$',string)
 	nbPlayers = int(matchObj.group(2));
 	playerId = int(matchObj.group(3));
 	speed = int(matchObj.group(4));
@@ -21,7 +21,7 @@ def initStringToAI(string):
 	
 	for i in range (len(liste_node)):
 		l_n.append({})
-		information=re.search("(\d)(\(\d+,\d+\))\'(\d+)\'(\d+)\'(\d+)\'([I]+)",liste_node[i])
+		information=re.search("(\d+)(\(\d+,\d+\))\'(\d+)\'(\d+)\'(\d+)\'([I]+)",liste_node[i])
 		
                 
 		vitesse = 1;
